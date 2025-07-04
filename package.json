@@ -1,0 +1,26 @@
+{
+  "name": "shri2025-task-perfomance",
+  "version": "1.0.0",
+  "description": "## Задание Оптимизировать страницу, выложить результат на Github-Pages и отправить его на проверку на [https://shri-performance.ru/](https://shri-performance.ru/), отправив адрес вашей страницы. Нужно набрать минимум **80 баллов**. Набрать больше баллов возможно, но больше 120 в зачёт не пойдёт.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:js": "terser vendors/react-with-dom.js -o vendors/react-with-dom.min.js -c -m",
+    "build:css": "cleancss -o styles.min.css styles.css fonts.css reset.css vendors/bootstrap.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usichUs/shri2025-task-perfomance.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/usichUs/shri2025-task-perfomance/issues"
+  },
+  "homepage": "https://github.com/usichUs/shri2025-task-perfomance#readme",
+  "dependencies": {
+    "clean-css-cli": "^5.6.3",
+    "terser": "^5.43.1"
+  }
+}
