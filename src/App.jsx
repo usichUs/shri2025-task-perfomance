@@ -1,7 +1,7 @@
 import "./reset.css";
 import "./styles.css";
 
-import { Header, Main } from "./test";
+import { Header, Main } from "./Page";
 
 function App() {
   return (

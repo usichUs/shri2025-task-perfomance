@@ -1,15 +1,16 @@
-import { useEffect, useRef, useState, memo, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export const Header = memo(function Header() {
-  const [expanded, setExpanded] = useState(false);
-  const [toggled, setToggled] = useState(false);
+export function Header() {
+  let [expanded, setExpanded] = useState(false);
+  let [toggled, setToggled] = useState(false);
 
-  const onClick = useCallback(() => {
+  const onClick = () => {
     if (!toggled) {
       setToggled(true);
     }
+
     setExpanded(!expanded);
-  }, [toggled, expanded]);
+  };
 
   return (
     <header className="header">
@@ -52,19 +53,20 @@ export const Header = memo(function Header() {
       </ul>
     </header>
   );
-});
+}
 
-const Event = memo(function Event(props) {
+function Event(props) {
   const ref = useRef();
+
   const { onSize } = props;
 
   useEffect(() => {
+    const width = ref.current.offsetWidth;
+    const height = ref.current.offsetHeight;
     if (onSize) {
-      const width = ref.current.offsetWidth;
-      const height = ref.current.offsetHeight;
       onSize({ width, height });
     }
-  }, [onSize]);
+  });
 
   return (
     <li ref={ref} className={"event" + (props.slim ? " event_slim" : "")}>
@@ -81,7 +83,7 @@ const Event = memo(function Event(props) {
       </button>
     </li>
   );
-});
+}
 
 const TABS = {
   all: {
@@ -212,17 +214,14 @@ const TABS = {
     ],
   },
 };
-
 for (let i = 0; i < 6; ++i) {
   TABS.all.items = [...TABS.all.items, ...TABS.all.items];
 }
-
 const TABS_KEYS = Object.keys(TABS);
 
 export function Main() {
   const ref = useRef();
   const initedRef = useRef(false);
-  const sizesRef = useRef([]);
   const [activeTab, setActiveTab] = useState("");
   const [hasRightScroll, setHasRightScroll] = useState(false);
 
@@ -231,36 +230,27 @@ export function Main() {
       initedRef.current = true;
       setActiveTab(new URLSearchParams(location.search).get("tab") || "all");
     }
-  }, [activeTab]);
+  });
 
-  const onSelectInput = useCallback((event) => {
+  const onSelectInput = (event) => {
     setActiveTab(event.target.value);
-  }, []);
+  };
 
-  const onSize = useCallback(
-    (size) => {
-      sizesRef.current.push(size);
+  let sizes = [];
+  const onSize = (size) => {
+    sizes = [...sizes, size];
+  };
 
-      requestAnimationFrame(() => {
-        if (sizesRef.current.length > 0) {
-          const sumWidth = sizesRef.current.reduce(
-            (acc, item) => acc + item.width,
-            0
-          );
-          const newHasRightScroll = sumWidth > ref.current.offsetWidth;
+  useEffect(() => {
+    const sumWidth = sizes.reduce((acc, item) => acc + item.width, 0);
 
-          if (newHasRightScroll !== hasRightScroll) {
-            setHasRightScroll(newHasRightScroll);
-          }
+    const newHasRightScroll = sumWidth > ref.current.offsetWidth;
+    if (newHasRightScroll !== hasRightScroll) {
+      setHasRightScroll(newHasRightScroll);
+    }
+  });
 
-          sizesRef.current = [];
-        }
-      });
-    },
-    [hasRightScroll]
-  );
-
-  const onArrowClick = useCallback(() => {
+  const onArrowCLick = () => {
     const scroller = ref.current.querySelector(
       ".section__panel:not(.section__panel_hidden)"
     );
@@ -270,62 +260,7 @@ export function Main() {
         behavior: "smooth",
       });
     }
-  }, []);
-
-  const selectOptions = useMemo(
-    () =>
-      TABS_KEYS.map((key) => (
-        <option key={key} value={key}>
-          {TABS[key].title}
-        </option>
-      )),
-    []
-  );
-
-  const tabsList = useMemo(
-    () =>
-      TABS_KEYS.map((key) => (
-        <li
-          key={key}
-          role="tab"
-          aria-selected={key === activeTab ? "true" : "false"}
-          tabIndex={key === activeTab ? "0" : undefined}
-          className={
-            "section__tab" + (key === activeTab ? " section__tab_active" : "")
-          }
-          id={`tab_${key}`}
-          aria-controls={`panel_${key}`}
-          onClick={() => setActiveTab(key)}
-        >
-          {TABS[key].title}
-        </li>
-      )),
-    [activeTab]
-  );
-
-  const panelsList = useMemo(
-    () =>
-      TABS_KEYS.map((key) => (
-        <div
-          key={key}
-          role="tabpanel"
-          className={
-            "section__panel" +
-            (key === activeTab ? "" : " section__panel_hidden")
-          }
-          aria-hidden={key === activeTab ? "false" : "true"}
-          id={`panel_${key}`}
-          aria-labelledby={`tab_${key}`}
-        >
-          <ul className="section__panel-list">
-            {TABS[key].items.map((item, index) => (
-              <Event key={`${key}-${index}`} {...item} onSize={onSize} />
-            ))}
-          </ul>
-        </div>
-      )),
-    [activeTab, onSize]
-  );
+  };
 
   return (
     <main className="main">
@@ -433,18 +368,56 @@ export function Main() {
             defaultValue="all"
             onInput={onSelectInput}
           >
-            {selectOptions}
+            {TABS_KEYS.map((key) => (
+              <option key={key} value={key}>
+                {TABS[key].title}
+              </option>
+            ))}
           </select>
 
           <ul role="tablist" className="section__tabs">
-            {tabsList}
+            {TABS_KEYS.map((key) => (
+              <li
+                key={key}
+                role="tab"
+                aria-selected={key === activeTab ? "true" : "false"}
+                tabIndex={key === activeTab ? "0" : undefined}
+                className={
+                  "section__tab" +
+                  (key === activeTab ? " section__tab_active" : "")
+                }
+                id={`tab_${key}`}
+                aria-controls={`panel_${key}`}
+                onClick={() => setActiveTab(key)}
+              >
+                {TABS[key].title}
+              </li>
+            ))}
           </ul>
         </div>
 
         <div className="section__panel-wrapper" ref={ref}>
-          {panelsList}
+          {TABS_KEYS.map((key) => (
+            <div
+              key={key}
+              role="tabpanel"
+              className={
+                "section__panel" +
+                (key === activeTab ? "" : " section__panel_hidden")
+              }
+              aria-hidden={key === activeTab ? "false" : "true"}
+              id={`panel_${key}`}
+              aria-labelledby={`tab_${key}`}
+            >
+              <ul className="section__panel-list">
+                {TABS[key].items.map((item, index) => (
+                  <Event key={index} {...item} onSize={onSize} />
+                ))}
+              </ul>
+            </div>
+          ))}
           {hasRightScroll && (
-            <div className="section__arrow" onClick={onArrowClick}></div>
+            <div className="section__arrow" onClick={onArrowCLick}></div>
           )}
         </div>
       </section>
