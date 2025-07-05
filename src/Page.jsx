@@ -241,7 +241,6 @@ export function Main() {
     (size) => {
       sizesRef.current.push(size);
 
-      // Используем requestAnimationFrame для батчинга обновлений
       requestAnimationFrame(() => {
         if (sizesRef.current.length > 0) {
           const sumWidth = sizesRef.current.reduce(
@@ -254,7 +253,6 @@ export function Main() {
             setHasRightScroll(newHasRightScroll);
           }
 
-          // Очищаем массив после обработки
           sizesRef.current = [];
         }
       });
@@ -274,7 +272,6 @@ export function Main() {
     }
   }, []);
 
-  // Мемоизируем рендеринг опций селекта
   const selectOptions = useMemo(
     () =>
       TABS_KEYS.map((key) => (
@@ -285,7 +282,6 @@ export function Main() {
     []
   );
 
-  // Мемоизируем рендеринг табов
   const tabsList = useMemo(
     () =>
       TABS_KEYS.map((key) => (
@@ -307,7 +303,6 @@ export function Main() {
     [activeTab]
   );
 
-  // Мемоизируем рендеринг панелей
   const panelsList = useMemo(
     () =>
       TABS_KEYS.map((key) => (
